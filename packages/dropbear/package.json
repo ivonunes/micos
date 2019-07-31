@@ -1,0 +1,9 @@
+{
+  "name": "dropbear",
+  "version": "2018.76.0",
+  "scripts": {
+    "get": "./get.sh",
+    "build": "./build.sh",
+    "install": "npm run get && npm run build && ./install.sh"
+  }
+}

@@ -1,39 +1,17 @@
-#!/bin/sh -e
+#!/bin/sh
 
-. ./.config
+cd $WORK_DIR
 
-cd work/musl || exit 1
-cd $(ls -d *)
-cd musl_installed
-MUSL_INSTALLED=$(pwd)
-cd ../../../..
-
-cd work
-rm -rf rootfs
-
-cd busybox
-cd $(ls -d *)
-cp -R _install ../../rootfs
-
-cd ../../dropbear
-cd $(ls -d *)
-cp -R _install/* ../../rootfs
-
-cd ../../rootfs
-rm -f linuxrc
-
-ln -s dbclient usr/bin/ssh
-
-mkdir dev
+mkdir -p dev
 mkdir -p etc/rc.d
 mkdir -p etc/skel
-mkdir home
-mkdir lib$LIBDIRSUFFIX
-mkdir proc
-mkdir root
-mkdir run
-mkdir sys
-mkdir tmp
+mkdir -p home
+mkdir -p lib
+mkdir -p proc
+mkdir -p root
+mkdir -p run
+mkdir -p sys
+mkdir -p tmp
 mkdir -p var/log
 ln -s ../run var/run
 touch var/log/btmp
@@ -47,12 +25,6 @@ touch run/utmp
 chmod 1777 tmp
 
 cd etc
-cat >rc.d/README <<EOF
-
- As a convention, files here with extension ".sh" should be treated as
- system scripts, hence we need not invoke them manually.
-
-EOF
 
 cat >rc.d/rc.bootstrap.sh <<EOF
 #!/bin/sh
@@ -81,15 +53,15 @@ chmod +x rc.d/rc.bootstrap.sh
 
 cat >inittab <<EOF
 ::ctrlaltdel:/sbin/reboot
-::once:cat /etc/welcome.txt
+::once:cat /etc/issue
 ::respawn:/bin/cttyhack /bin/sh -l
 ::restart:/sbin/init
 ::sysinit:/etc/rc.d/rc.bootstrap.sh
-tty2::once:cat /etc/welcome.txt
+tty2::once:cat /etc/issue
 tty2::respawn:/bin/sh -l
-tty3::once:cat /etc/welcome.txt
+tty3::once:cat /etc/issue
 tty3::respawn:/bin/sh -l
-tty4::once:cat /etc/welcome.txt
+tty4::once:cat /etc/issue
 tty4::respawn:/bin/sh -l
 
 EOF
@@ -118,8 +90,9 @@ mkdir -p dropbear
 ../usr/bin/dropbearkey -t dss -f dropbear/dropbear_dss_host_key
 ../usr/bin/dropbearkey -t ecdsa -f dropbear/dropbear_ecdsa_host_key -s 521
 ../usr/bin/dropbearkey -t rsa -f dropbear/dropbear_rsa_host_key -s 1024
+
 echo "root:x:0:" >group
-echo "root:AprZpdBUhZXss:0:0:Minimal Root,,,:/root:/bin/sh" >passwd
+echo "root:AprZpdBUhZXss:0:0:Root User,,,:/root:/bin/sh" >passwd
 
 cat >rc.d/rc.dropbeard <<EOF
 #!/bin/sh
@@ -159,8 +132,8 @@ EOF
 chmod +x rc.d/rc.dropbeard
 
 cat >resolv.conf <<EOF
-nameserver 8.8.8.8
-nameserver 8.8.4.4
+nameserver 1.1.1.1
+nameserver 1.0.0.1
 
 EOF
 
@@ -170,43 +143,40 @@ cat >syslog.conf <<EOF
 kern,user.*                                 /var/log/messages	# all messages of kern and user facilities
 kern.!err                                   /var/log/critical	# all messages of kern facility with priorities lower than err (warn, notice ...)
 *.*;auth,authpriv.none                      /var/log/noauth	# all messages except ones with auth and authpriv facilities
-kern,user.*;kern.!=notice;*.err;syslog.none /var/log/OMG	# some whicked rule just as an example =)
 *.*                                         /dev/null		# this prevents from logging to default log file (-O FILE or /var/log/messages)
 
 EOF
 
-cat >welcome.txt <<EOF
-[H[2J ##############$(echo "${DISTRO_PROP}_${KERNEL_PROP}_${KERNEL_VERSION}_${TARCH}" |tr [A-Z-a-z0-9_.] "#")#########
-#              $(echo "${DISTRO_PROP}_${KERNEL_PROP}_${KERNEL_VERSION}_${TARCH}" |tr [A-Z-a-z0-9_.] " ")        #
-#  Welcome to "${DISTRO_PROP}      ${KERNEL_PROP}-${KERNEL_VERSION}-${TARCH}"  #
-#              $(echo "${DISTRO_PROP}_${KERNEL_PROP}_${KERNEL_VERSION}_${TARCH}" |tr [A-Z-a-z0-9_.] " ")        #
-###############$(echo "${DISTRO_PROP}_${KERNEL_PROP}_${KERNEL_VERSION}_${TARCH}" |tr [A-Z-a-z0-9_.] "#")########
+cat >issue <<EOF
+[H[2J ##############$(echo "${OS_PROP}_${OS_VERSION}" |tr [A-Z-a-z0-9_.] "#")#########
+#              $(echo "${OS_PROP}_${OS_VERSION}" |tr [A-Z-a-z0-9_.] " ")        #
+#  Welcome to ${OS_PROP} ${OS_VERSION}  #
+#              $(echo "${OS_PROP}_${OS_VERSION}" |tr [A-Z-a-z0-9_.] " ")        #
+###############$(echo "${OS_PROP}_${OS_VERSION}" |tr [A-Z-a-z0-9_.] "#")########
+
+EOF
+
+cat >os-release <<EOF
+NAME="${OS_PROP}"
+VERSION="${OS_VERSION}"
+ID=${OS_NAME}
+PRETTY_NAME="${OS_PROP} ${OS_VERSION}"
+VERSION_ID="${OS_VERSION}"
+HOME_URL="${OS_HOMEPAGE}"
+SUPPORT_URL="${OS_BUGS}"
+BUG_REPORT_URL="${OS_BUGS}"
 
 EOF
 
 cd ..
-
-cat >init <<EOF
-#!/bin/sh
-
-exec /sbin/init
-
-EOF
-chmod +x init
-
-cp $MUSL_INSTALLED/lib/*.so* ./lib$LIBDIRSUFFIX
 
 cat >./etc/hosts <<EOF
 # $Local: etc/hosts,v 1.73 2013/05/18 05:50:04 bsd Exp $
 #
 # Do not remove the following line, or various programs that require
 # network functionality will fail.
-127.0.0.1	localhost		localhost.localdomain
+127.0.0.1	localhost localhost.localdomain $OS_NAME.localhost $OS_NAME
 
-# This next entry is technically wrong, but good enough to get TCP/IP
-# to quiet apps complaining that they can't verify the hostname on a
-# loopback-only Linux box.
-127.0.0.1	$DISTRO_NAME.example.net $DISTRO_NAME
 EOF
 cp /etc/services ./etc
 
@@ -241,12 +211,3 @@ PS2='> '
 
 EOF
 touch ./root/.ash_history
-ln -s root/.ash_history .
-ln -s root/.profile .
-
-if [ -n "$LIBDIRSUFFIX" ]; then
-  ln -s lib64 lib
-fi
-
-cd ../..
-

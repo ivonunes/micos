@@ -1,0 +1,31 @@
+{
+  "name": "novo",
+  "prop": "Novo",
+  "version": "0.1.0",
+  "description": "",
+  "scripts": {
+    "test-i386": "qemu-system-i386 -m 64M -cdrom dist/$npm_package_name-$npm_package_version-i386.iso",
+    "test-x86_64": "qemu-system-x86_64 -m 64M -cdrom dist/$npm_package_name-$npm_package_version-x86_64.iso",
+    "build-i386": "docker build -f Dockerfile.i386 -t novo/builder-i386 .&& docker run -i -t --name novo_build-i386 novo/builder-i386 && docker cp novo_build-i386:/build/tmp/build.iso dist/$npm_package_name-$npm_package_version-i386.iso && docker rm -f novo_build-i386",
+    "build-x86_64": "docker build -f Dockerfile.x86_64 -t novo/builder-x86_64 .&& docker run -i -t --name novo_build-x86_64 novo/builder-x86_64 && docker cp novo_build-x86_64:/build/tmp/build.iso dist/$npm_package_name-$npm_package_version-x86_64.iso && docker rm -f novo_build-x86_64"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ivonunes/novo.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ivonunes/novo/issues"
+  },
+  "homepage": "https://novo.ivonunes.me",
+  "systemDependencies": [
+    "linux",
+    "musl",
+    "busybox",
+    "dropbear",
+    "core-files"
+  ],
+  "devDependencies": {
+    "standard": "^12.0.1"
+  }
+}

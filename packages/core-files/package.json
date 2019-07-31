@@ -1,0 +1,8 @@
+{
+  "name": "core-files",
+  "version": "0.1.0",
+  "scripts": {
+  	"build": "./build.sh",
+    "install": "npm run build && ./install.sh"
+  }
+}

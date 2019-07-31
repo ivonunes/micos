@@ -1,0 +1,7 @@
+FROM i386/alpine:3.8
+
+RUN apk -U add wget bc build-base gawk xorriso libelf-dev openssl-dev bison flex syslinux nodejs npm linux-headers perl musl-dev rsync git argp-standalone
+COPY . /build
+
+WORKDIR /build
+CMD ["node", "lib/index.js"]

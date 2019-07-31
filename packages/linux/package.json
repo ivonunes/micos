@@ -1,0 +1,9 @@
+{
+  "name": "linux",
+  "version": "4.18.3",
+  "scripts": {
+    "get": "./get.sh",
+    "build": "./build.sh",
+    "install": "npm run get && npm run build && ./install.sh"
+  }
+}

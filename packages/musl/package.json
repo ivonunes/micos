@@ -1,0 +1,9 @@
+{
+  "name": "musl",
+  "version": "1.1.19",
+  "scripts": {
+    "get": "./get.sh",
+    "build": "./build.sh",
+    "install": "npm run get && npm run build && ./install.sh"
+  }
+}
