@@ -1,0 +1,93 @@
+html, body, .main-page, .container, .main-row  {
+    height: 100%;
+}
+
+.logo .top-logo{
+    
+    margin: 25px 10px;
+    float: left;
+    text-decoration: none;
+    cursor: pointer;
+    width: 100%;
+    max-width: 150px;
+
+}
+
+body{
+
+    background-color: #f6f6f6;
+
+}
+
+.header {
+    position: absolute;
+    width: 100%;
+}
+
+.header-coming{
+    
+    float: right;
+    margin-top: 35px;
+
+}
+
+.header-coming h4 {
+    font-size: 1.2em;
+    font-family: "Open Sans", sans-serif;
+}
+
+.header-text{
+
+    text-align: center;
+    font-size: 2.2em;
+    font-family: "Open Sans", sans-serif;
+    margin-bottom: 25px;
+
+}
+
+.body-text{
+
+    text-align: center;
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1.2em;
+    font-family: "Open Sans", sans-serif;
+
+}
+
+.main-row{
+
+    padding: 100px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.footer {
+    text-align: center;
+    position: absolute;
+    left: 0;
+    bottom: 10px;
+    width: 100%;
+    font-family: "Open Sans", sans-serif;
+    font-size: 0.8em;
+}
+
+.footer p span {
+    color: #F33A00;
+}
+
+.footer p {
+    padding: 0 10px;
+}
+
+.footer a, .footer a:hover, .footer a:active, .footer a:focus, .footer a:visited {
+    color: #333;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
